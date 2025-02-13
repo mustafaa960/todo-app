@@ -1,0 +1,60 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Todo {
+  _id: String!
+  title: String!
+  description: String
+  status: TodoStatus!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Status of a Todo item"""
+enum TodoStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Query {
+  todos(offset: Int = 0, limit: Int = 10, search: String, status: TodoStatus, createdFrom: DateTime, createdTo: DateTime): PaginatedType!
+  todo(id: String!): Todo
+}
+
+type PaginatedType {
+  total: Int!
+  offset: Int!
+  limit: Int!
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  items: [Todo!]!
+}
+
+type Mutation {
+  createTodo(input: CreateTodoInput!): Todo!
+  updateTodo(id: String!, input: UpdateTodoInput!): Todo!
+  deleteTodo(id: String!): Todo!
+}
+
+input CreateTodoInput {
+  title: String!
+  description: String
+
+  """Status must be PENDING, IN_PROGRESS, or DONE"""
+  status: TodoStatus!
+}
+
+input UpdateTodoInput {
+  title: String
+  description: String
+
+  """Status must be PENDING, IN_PROGRESS, or DONE"""
+  status: TodoStatus
+}
