@@ -23,18 +23,18 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type Query {
-  todos(offset: Int = 0, limit: Int = 10, search: String, status: TodoStatus, createdFrom: DateTime, createdTo: DateTime): PaginatedType!
-  todo(id: String!): Todo
-}
-
-type PaginatedType {
+type PaginatedTodo {
+  items: [Todo!]!
   total: Int!
   offset: Int!
   limit: Int!
   hasNextPage: Boolean!
   hasPreviousPage: Boolean!
-  items: [Todo!]!
+}
+
+type Query {
+  todos(offset: Int = 0, limit: Int = 10, search: String, status: TodoStatus, createdFrom: DateTime, createdTo: DateTime): PaginatedTodo!
+  todo(id: String!): Todo
 }
 
 type Mutation {

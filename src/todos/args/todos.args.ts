@@ -1,10 +1,10 @@
 import { ArgsType, Field } from '@nestjs/graphql';
 import { IsOptional, IsEnum, IsString } from 'class-validator';
 import { TodoStatus } from '../enums/todo-status.enum';
-import { PaginationArgs } from '../../common/args/pagination.args';
+import { OffsetPaginationArgs } from 'src/common/args/pagination.args';
 
 @ArgsType()
-export class FindTodosArgs extends PaginationArgs {
+export class FindTodosArgs extends OffsetPaginationArgs {
   @Field(() => String, { nullable: true })
   @IsOptional()
   @IsString()

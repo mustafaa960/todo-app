@@ -1,28 +1,35 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { Type } from '@nestjs/common';
 
-@ObjectType()
-export class BasePaginatedResponse {
-  @Field(() => Int)
+export interface IOffsetPaginatedType<T> {
+  items: T[];
   total: number;
-
-  @Field(() => Int)
   offset: number;
-
-  @Field(() => Int)
   limit: number;
-
-  @Field(() => Boolean)
   hasNextPage: boolean;
-
-  @Field(() => Boolean)
   hasPreviousPage: boolean;
 }
 
-export function PaginatedResponse<T>(classRef: T): any {
+export function Paginated<T>(classRef: Type<T>): Type<IOffsetPaginatedType<T>> {
   @ObjectType({ isAbstract: true })
-  abstract class PaginatedType extends BasePaginatedResponse {
+  abstract class PaginatedType implements IOffsetPaginatedType<T> {
     @Field(() => [classRef])
     items: T[];
+
+    @Field(() => Int)
+    total: number;
+
+    @Field(() => Int)
+    offset: number;
+
+    @Field(() => Int)
+    limit: number;
+
+    @Field()
+    hasNextPage: boolean;
+
+    @Field()
+    hasPreviousPage: boolean;
   }
-  return PaginatedType;
+  return PaginatedType as Type<IOffsetPaginatedType<T>>;
 }

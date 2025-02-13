@@ -2,7 +2,7 @@ import { ArgsType, Field, Int } from '@nestjs/graphql';
 import { IsOptional, Min } from 'class-validator';
 
 @ArgsType()
-export class PaginationArgs {
+export class OffsetPaginationArgs {
   @Field(() => Int, { nullable: true, defaultValue: 0 })
   @IsOptional()
   @Min(0)

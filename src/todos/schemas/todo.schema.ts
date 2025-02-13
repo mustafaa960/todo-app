@@ -2,9 +2,9 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { ObjectType, Field } from '@nestjs/graphql';
 import { TodoStatus } from '../enums/todo-status.enum';
+import { Paginated } from 'src/common/dto/pagination.dto';
 
 export type TodoDocument = Todo & Document;
-
 @Schema({ timestamps: true })
 @ObjectType()
 export class Todo {
@@ -29,5 +29,8 @@ export class Todo {
   @Field(() => Date)
   updatedAt: Date;
 }
+
+@ObjectType()
+export class PaginatedTodo extends Paginated(Todo) {}
 
 export const TodoSchema = SchemaFactory.createForClass(Todo);
