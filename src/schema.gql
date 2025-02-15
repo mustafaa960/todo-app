@@ -32,15 +32,34 @@ type PaginatedTodo {
   hasPreviousPage: Boolean!
 }
 
+type User {
+  _id: String!
+  username: String!
+  fullName: String
+}
+
+type AuthResponse {
+  accessToken: String!
+  refreshToken: String!
+}
+
 type Query {
   todos(offset: Int = 0, limit: Int = 10, search: String, status: TodoStatus, createdFrom: DateTime, createdTo: DateTime): PaginatedTodo!
   todo(id: String!): Todo
+  user(id: String!): User
+  userByUsername(username: String!): User
+  profile: User!
 }
 
 type Mutation {
   createTodo(input: CreateTodoInput!): Todo!
   updateTodo(id: String!, input: UpdateTodoInput!): Todo!
   deleteTodo(id: String!): Todo!
+  createUser(username: String!, password: String!, fullName: String): User!
+  registerUser(username: String!, password: String!, fullName: String): User!
+  login(username: String!, password: String!): AuthResponse!
+  refreshToken: AuthResponse!
+  signOut: Boolean!
 }
 
 input CreateTodoInput {

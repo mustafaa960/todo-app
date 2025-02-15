@@ -2,9 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Todo, TodoDocument } from './schemas/todo.schema';
 import { FilterQuery, Model } from 'mongoose';
-import { CreateTodoInput } from './input/create-todo.input';
-import { UpdateTodoInput } from './input/update-todo.input';
-import { FindTodosArgs } from './args/todos.args';
+
+import { FindTodosArgs } from './dto/todos.args';
+import { CreateTodoInput } from './dto/create-todo.input';
+import { UpdateTodoInput } from './dto/update-todo.input';
 
 @Injectable()
 export class TodoService {
@@ -75,3 +76,4 @@ export class TodoService {
     return this.todoModel.findByIdAndDelete(id);
   }
 }
+

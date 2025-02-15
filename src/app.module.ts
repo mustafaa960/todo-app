@@ -1,18 +1,29 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-
-interface OriginalError extends Error {
-  message: string;
-}
-import { Module } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  HttpException,
+  InternalServerErrorException,
+  Module,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TodoModule } from './todos/todo.module';
 import { join } from 'path';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
+import { UsersModule } from './users/user.module';
+import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { GraphQLError } from 'graphql';
+
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true, cache: true }),
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
       useFactory() {
@@ -20,19 +31,42 @@ import { ConfigModule } from '@nestjs/config';
           playground: false,
           plugins: [ApolloServerPluginLandingPageLocalDefault()],
           autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-          formatError: (error) => {
-            const originalError = error.extensions
-              ?.originalError as OriginalError;
+          autoTransformHttpErrors: true,
 
-            if (!originalError) {
-              return {
-                message: error.message,
-                code: error.extensions?.code,
-              };
+          formatError: (error: GraphQLError) => {
+            const originalError = error.extensions?.originalError as any;
+            let statusCode = originalError?.statusCode || 500;
+            let message = originalError?.message || error.message;
+
+            // ✅ Detect GraphQL validation errors (e.g., missing required variables)
+            if (error.message.startsWith('Variable')) {
+              statusCode = 400;
             }
+
+            if (
+              originalError?.response &&
+              Array.isArray(originalError.response.message)
+            ) {
+              statusCode = 400;
+              message = originalError.response.message.join(', ');
+            }
+
+            const errorTypeMap: { [key: number]: string } = {
+              400: 'BAD_REQUEST',
+              401: 'UNAUTHORIZED',
+              403: 'FORBIDDEN',
+              404: 'NOT_FOUND',
+              409: 'CONFLICT',
+              500: 'INTERNAL_SERVER_ERROR',
+            };
+
+            const errorType = errorTypeMap[statusCode] || 'GRAPHQL_ERROR';
+
             return {
-              message: originalError.message,
-              code: error.extensions?.code,
+              statusCode,
+              message,
+              errorType,
+              field: error.path ? error.path.join('.') : null,
             };
           },
         };
@@ -40,8 +74,16 @@ import { ConfigModule } from '@nestjs/config';
     }),
     MongooseModule.forRoot(process.env.MONGODB_URI),
     TodoModule,
+    UsersModule,
+    AuthModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}
+

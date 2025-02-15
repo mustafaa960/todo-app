@@ -1,9 +1,9 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { CreateTodoInput } from './input/create-todo.input';
 import { TodoService } from './todo.service';
 import { PaginatedTodo, Todo } from './schemas/todo.schema';
-import { UpdateTodoInput } from './input/update-todo.input';
-import { FindTodosArgs } from './args/todos.args';
+import { FindTodosArgs } from './dto/todos.args';
+import { CreateTodoInput } from './dto/create-todo.input';
+import { UpdateTodoInput } from './dto/update-todo.input';
 
 @Resolver(() => Todo)
 export class TodoResolver {
@@ -38,3 +38,4 @@ export class TodoResolver {
     return this.todoService.delete(id);
   }
 }
+
