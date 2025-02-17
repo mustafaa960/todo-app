@@ -24,7 +24,7 @@ Ensure you have **Node.js** installed.
 ```bash
 git clone https://github.com/mustafaa960/todo-app.git
 cd todo-app
-npm install or npm install --force
+npm npm install --force
 ```
 
 ---
