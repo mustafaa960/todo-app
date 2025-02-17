@@ -1,10 +1,10 @@
-import { ArgsType, Field } from '@nestjs/graphql';
-import { IsOptional } from 'class-validator';
-import { LoginInput } from 'src/auth/dto/login.input';
+import { ArgsType, Field, InputType } from '@nestjs/graphql';
+import { RegisterUserInput } from 'src/auth/dto/register.input';
+import { IsMongoId } from 'class-validator';
 
-@ArgsType()
-export class CreateUserInput extends LoginInput {
-  @Field(() => String, { nullable: true })
-  @IsOptional()
-  fullName?: string;
+@InputType()
+export class CreateUserWithRoleInput extends RegisterUserInput {
+  @Field(() => String, { nullable: false, description: 'Role ID for the user' })
+  @IsMongoId({ message: 'Invalid roleId format' })
+  roleId: string;
 }

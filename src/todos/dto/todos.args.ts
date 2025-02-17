@@ -13,7 +13,7 @@ export class FindTodosArgs extends OffsetPaginationArgs {
   @Field(() => TodoStatus, { nullable: true })
   @IsOptional()
   @IsEnum(TodoStatus, {
-    message: 'Status must be PENDING, IN_PROGRESS, or DONE',
+    message: 'Status must be TODO PENDING, IN_PROGRESS, or DONE',
   })
   status?: TodoStatus;
 

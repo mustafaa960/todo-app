@@ -1,7 +1,6 @@
 import {
   Injectable,
   ExecutionContext,
-  ForbiddenException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GqlExecutionContext } from '@nestjs/graphql';

@@ -2,17 +2,50 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Permission {
+  resource: Resource!
+  actions: [Action!]!
+}
+
+enum Resource {
+  TODOS
+  USERS
+  ROLES
+}
+
+enum Action {
+  READ
+  CREATE
+  UPDATE
+  DELETE
+}
+
+type Role {
+  _id: String!
+  name: String!
+  permissions: [Permission!]!
+}
+
+type User {
+  _id: String!
+  username: String!
+  fullName: String
+  roleId: String!
+}
+
 type Todo {
   _id: String!
   title: String!
   description: String
   status: TodoStatus!
+  user: User
   createdAt: DateTime!
   updatedAt: DateTime!
 }
 
 """Status of a Todo item"""
 enum TodoStatus {
+  TODO
   PENDING
   IN_PROGRESS
   COMPLETED
@@ -32,48 +65,131 @@ type PaginatedTodo {
   hasPreviousPage: Boolean!
 }
 
-type User {
-  _id: String!
-  username: String!
-  fullName: String
-}
-
 type AuthResponse {
   accessToken: String!
   refreshToken: String!
 }
 
 type Query {
-  todos(offset: Int = 0, limit: Int = 10, search: String, status: TodoStatus, createdFrom: DateTime, createdTo: DateTime): PaginatedTodo!
-  todo(id: String!): Todo
+  profile: User!
   user(id: String!): User
   userByUsername(username: String!): User
-  profile: User!
+  users: [User!]!
+  roles: [Role!]!
+  role(id: String!): Role!
+  todos(offset: Int = 0, limit: Int = 10, search: String, status: TodoStatus, createdFrom: DateTime, createdTo: DateTime): PaginatedTodo!
+  myTodos(offset: Int = 0, limit: Int = 10, search: String, status: TodoStatus, createdFrom: DateTime, createdTo: DateTime): PaginatedTodo!
+  findAnyTodo(id: String!): Todo
+  findMyTodo(id: String!): Todo
 }
 
 type Mutation {
-  createTodo(input: CreateTodoInput!): Todo!
-  updateTodo(id: String!, input: UpdateTodoInput!): Todo!
-  deleteTodo(id: String!): Todo!
-  createUser(username: String!, password: String!, fullName: String): User!
-  registerUser(username: String!, password: String!, fullName: String): User!
-  login(username: String!, password: String!): AuthResponse!
+  registerUser(input: RegisterUserInput!): User!
+  login(input: LoginInput!): AuthResponse!
   refreshToken: AuthResponse!
   signOut: Boolean!
+  createUser(input: CreateUserWithRoleInput!): User!
+  updateOwnUser(input: UpdateOwnUserInput!): User!
+  updateAnyUser(userId: String!, input: UpdateUserInput!): User!
+  createRole(input: CreateRoleInput!): Role!
+  updateRole(id: String!, input: UpdateRoleInput!): Role!
+  deleteRole(id: String!): Boolean!
+  createOwnTodo(input: CreateOwnTodoInput!): Todo!
+  createAnyTodo(input: CreateAnyTodoInput!): Todo!
+  updateAnyTodo(id: String!, input: UpdateAnyTodoInput!): Todo!
+  updateOwnTodo(id: String!, input: UpdateOwnTodoInput!): Todo!
+  deleteOwnTodo(id: String!): Todo!
+  deleteAnyTodo(id: String!): Todo!
 }
 
-input CreateTodoInput {
+input RegisterUserInput {
+  username: String!
+  password: String!
+  fullName: String
+}
+
+input LoginInput {
+  username: String!
+  password: String!
+}
+
+input CreateUserWithRoleInput {
+  username: String!
+  password: String!
+  fullName: String
+
+  """Role ID for the user"""
+  roleId: String!
+}
+
+input UpdateOwnUserInput {
+  password: String
+  fullName: String
+}
+
+input UpdateUserInput {
+  username: String
+  password: String
+  fullName: String
+
+  """Role ID for the user"""
+  roleId: String
+}
+
+input CreateRoleInput {
+  name: String!
+  permissions: [PermissionInput!]!
+}
+
+input PermissionInput {
+  resource: Resource!
+  actions: [Action!]!
+}
+
+input UpdateRoleInput {
+  name: String
+  permissions: [PermissionInput!]
+}
+
+input CreateOwnTodoInput {
   title: String!
   description: String
 
-  """Status must be PENDING, IN_PROGRESS, or DONE"""
+  """Status must be TODO PENDING, IN_PROGRESS, or DONE"""
   status: TodoStatus!
 }
 
-input UpdateTodoInput {
+input CreateAnyTodoInput {
+  title: String!
+  description: String
+
+  """Status must be TODO PENDING, IN_PROGRESS, or DONE"""
+  status: TodoStatus!
+
+  """Role ID for the user"""
+  userId: String
+}
+
+input UpdateAnyTodoInput {
   title: String
   description: String
 
-  """Status must be PENDING, IN_PROGRESS, or DONE"""
+  """Status must be TODO PENDING, IN_PROGRESS, or DONE"""
   status: TodoStatus
+
+  """Role ID for the user"""
+  userId: String
+}
+
+input UpdateOwnTodoInput {
+  title: String
+  description: String
+
+  """Status must be TODO PENDING, IN_PROGRESS, or DONE"""
+  status: TodoStatus
+}
+
+type Subscription {
+  todoCreated: Todo!
+  todoUpdated: Todo!
 }

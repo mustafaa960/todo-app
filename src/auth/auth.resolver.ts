@@ -7,8 +7,9 @@ import { AuthResponse } from './dto/auth-response.dto';
 import { UseGuards } from '@nestjs/common';
 import { Public } from './decorators/public.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { CreateUserInput } from 'src/users/dto/create-user.input';
 import { RefreshTokenGuard } from './guards/refresh-auth.guard';
+import { RegisterUserInput } from './dto/register.input';
+import { CurrentUser } from './decorators/current-user.decorator';
 
 @Resolver(() => User)
 export class AuthResolver {
@@ -16,7 +17,7 @@ export class AuthResolver {
 
   @Public()
   @Mutation(() => User, { name: 'registerUser' })
-  async register(@Args() input: CreateUserInput): Promise<User> {
+  async register(@Args("input") input: RegisterUserInput): Promise<User> {
     return this.authService.registerUser(input);
   }
 
@@ -24,7 +25,7 @@ export class AuthResolver {
   @UseGuards(LocalAuthGuard)
   @Mutation(() => AuthResponse, { name: 'login' })
   async login(
-    @Args() input: LoginInput,
+    @Args("input") input: LoginInput,
     @Context() ctx,
   ): Promise<AuthResponse> {
     try {
@@ -32,11 +33,6 @@ export class AuthResolver {
     } catch (error) {
       throw error;
     }
-  }
-
-  @Query(() => User, { name: 'profile' })
-  async profile(@Context() context): Promise<User> {
-    return context.req.user;
   }
 
   @Public()
@@ -48,7 +44,7 @@ export class AuthResolver {
 
   @Mutation(() => Boolean, { name: 'signOut' })
   async signOut(@Context() context): Promise<boolean> {
-    console.log(context.req.user._id)
+    console.log(context.req.user._id);
     await this.authService.signOut(context.req.user._id);
     return true;
   }

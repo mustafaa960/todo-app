@@ -1,7 +1,7 @@
-import { ArgsType, Field } from '@nestjs/graphql';
+import { ArgsType, Field, InputType } from '@nestjs/graphql';
 import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 
-@ArgsType()
+@InputType()
 export class LoginInput {
   @Field(() => String)
   @IsNotEmpty({ message: 'Username is required' })

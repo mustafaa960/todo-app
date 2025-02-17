@@ -21,26 +21,28 @@ export class LocalAuthGuard extends AuthGuard('local') {
       const result = (await super.canActivate(context)) as boolean;
       return result;
     } catch (error) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Invalid credentials1');
     }
   }
 
   getRequest(context: ExecutionContext) {
     let req;
-
+  
     if (context.getType() === 'http') {
       req = context.switchToHttp().getRequest();
     } else {
       const gqlExecutionContext = GqlExecutionContext.create(context);
       const gqlContext = gqlExecutionContext.getContext();
       const gqlArgs = gqlExecutionContext.getArgs();
-
+  
       req = gqlContext.req;
-      req.body = { ...req.body, ...gqlArgs };
+      // 🔥 Fix: Extract input fields properly when using @InputType()
+      req.body = gqlArgs.input ? { ...gqlArgs.input } : {};
     }
-
+  
     return req;
   }
+  
 
   private async validateLoginInput(body: any) {
     const loginInput = plainToInstance(LoginInput, body);

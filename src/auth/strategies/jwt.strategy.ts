@@ -1,13 +1,13 @@
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { User } from '../../users/schemas/user.schema';
-import { ConfigService, ConfigType } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth.service';
 import { AuthJwtPayload } from '../types/auth-jwtPayload';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy,'jwt') {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     readonly configService: ConfigService,
     private authService: AuthService,
@@ -19,7 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy,'jwt') {
     });
   }
 
-  async validate( payload: AuthJwtPayload): Promise<User> {
+  async validate(payload: AuthJwtPayload): Promise<Partial<User>> {
     if (!payload.sub) {
       throw new UnauthorizedException('Invalid token: Missing user ID');
     }

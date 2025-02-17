@@ -1,9 +1,15 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsNotEmpty, IsString, IsOptional, IsEnum } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsMongoId,
+} from 'class-validator';
 import { TodoStatus } from '../enums/todo-status.enum';
 
 @InputType()
-export class CreateTodoInput {
+export class CreateOwnTodoInput {
   @Field(() => String)
   @IsNotEmpty({ message: 'Title cannot be empty' })
   @IsString()
@@ -15,10 +21,18 @@ export class CreateTodoInput {
   description?: string;
 
   @Field(() => TodoStatus, {
-    description: 'Status must be PENDING, IN_PROGRESS, or DONE',
+    description: 'Status must be TODO PENDING, IN_PROGRESS, or DONE',
   })
   @IsEnum(TodoStatus, {
-    message: 'Status must be PENDING, IN_PROGRESS, or DONE',
+    message: 'Status must be TODO PENDING, IN_PROGRESS, or DONE',
   })
   status: TodoStatus;
 }
+@InputType()
+export class CreateAnyTodoInput extends CreateOwnTodoInput {
+  @Field(() => String, { nullable: true, description: 'Role ID for the user' })
+  @IsMongoId({ message: 'Invalid userId format' })
+  @IsOptional()
+  userId?: string;
+}
+
